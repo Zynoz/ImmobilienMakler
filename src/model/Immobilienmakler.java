@@ -231,10 +231,49 @@ public class Immobilienmakler implements Serializable
     }
 
     /**
-     * Methode zum testen von import/export Methoden.
+     * Aufgabe 9
+     * Exportiert alle Wohnhäuser im CSV Format in eine Datei.
+     * @param filename Pfad und Dateiname, wo die Wohnhäuser hingespeichert werden sollen.
+     * @throws ImmobilienException
      */
-    public void clear() {
-        immobilien.clear();
+    public void exportWohnhaeuser(String filename) throws ImmobilienException {
+        try {
+            FileWriter fw = new FileWriter(filename);
+            for (Immobilie i: immobilien) {
+                if (i instanceof Wohnhaus) {
+                    Wohnhaus w = (Wohnhaus) i;
+                    fw.append(w.toStringFormat()).append("\n");
+                }
+            }
+            fw.flush();
+            fw.close();
+        } catch (IOException e) {
+            throw new ImmobilienException("error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Aufgabe 10
+     * Fügt alle Wohnhäuser aus der angegebenen Datei zur collection hinzu.
+     * @param filename Pfad und Dateiname, von wo die Wohnhäuser eingelesen werden sollen.
+     * @throws ImmobilienException
+     */
+    public void importWohnhaeuser(String filename) throws ImmobilienException {
+        if (Files.exists(Paths.get(filename))) {
+            String line;
+            try {
+                try(BufferedReader br = new BufferedReader(new FileReader(filename))) {
+                    while ((line = br.readLine()) != null) {
+                        String[] csv = line.split(";");
+                        immobilien.add(new Wohnhaus(csv[0], Double.valueOf(csv[1]), csv[2].charAt(0), Double.valueOf(csv[3])));
+                    }
+                }
+            } catch (IOException e) {
+                throw new ImmobilienException("error: " + e.getMessage());
+            }
+        } else {
+            throw new ImmobilienException("");
+        }
     }
 
     /**
@@ -272,5 +311,12 @@ public class Immobilienmakler implements Serializable
         } else {
             throw new ImmobilienException("erro: File existiert nicht.");
         }
+    }
+
+    /**
+     * Methode zum testen von import/export Methoden.
+     */
+    public void clear() {
+        immobilien.clear();
     }
 }

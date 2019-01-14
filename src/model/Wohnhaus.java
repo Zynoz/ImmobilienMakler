@@ -64,4 +64,20 @@ public class Wohnhaus extends Immobilie
     	return new StringBuilder("Wohnhaus @ ").append(super.toString()).append(" -> Kat. ").append(kategorie).
     							 append(", € ").append(berechneVerkehrswert()).toString();
     }
+
+    /**
+     * Formatiert das Wohnhaus in ein CSV Format.
+     * @return
+     */
+    public String toStringFormat() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getAdresse())
+                .append(";")
+                .append(getFlaeche())
+                .append(";")
+                .append(getKategorie())
+                .append(";")
+                .append(getEinheitsWert());
+        return sb.toString();
+    }
 }
