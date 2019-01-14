@@ -19,22 +19,6 @@ public class Immobilienmakler implements Serializable
         immobilien = new ArrayList<>();
     }
 
-    /**
-     * Aufgabe 12
-     * @param filename Pfad wo die einzulesende Datei ist.
-     * @return Gibt einen neuen ImmobilienMakler zurück, wenn die Datei existiert. Ansonsten null
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public static Immobilienmakler loadMakler(String filename) throws IOException, ClassNotFoundException {
-        if (Files.exists(Paths.get(filename))) {    //Überprüft, ob Datei existiert.
-            FileInputStream fis = new FileInputStream(filename);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            return (Immobilienmakler) ois.readObject();
-        } else {
-            return null;
-        }
-    }
     //------------------------------------- getter -------------------
     public String getName()
     {
@@ -69,7 +53,6 @@ public class Immobilienmakler implements Serializable
         return sb.toString();
     }
     //------------------------------- Files ---------------------------------------
-
     /**
      * Aufgabe 5
      * Entgernt Immobilie an übergebener Position.
@@ -129,6 +112,7 @@ public class Immobilienmakler implements Serializable
     /**
      * Aufgabe 5
      * Sortiert alle Immobilien absteigend mittels Comparator.
+     * @see AdressComparator
      */
     public void sortiereAdresse() {
         immobilien.sort(new AdressComparator());
@@ -159,55 +143,6 @@ public class Immobilienmakler implements Serializable
     }
 
     /**
-     * Aufgabe 6
-     * Speichert alle Immobilien in eine serialisierte Datei ab.
-     * @param filename Pfad und Name, wo die die Datei gespeichert wird.
-     * @throws IOException
-     */
-    public void saveImmobilien(String filename) throws IOException {
-        FileOutputStream fos = new FileOutputStream(filename);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(immobilien);
-        oos.close();
-    }
-
-    public void saveMakler(String filename) throws IOException {
-        FileOutputStream fos = new FileOutputStream(filename);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(this);
-        oos.close();
-    }
-
-    public void exportImmobilienCsv(String filename) throws IOException {
-        FileWriter fileWriter = new FileWriter(filename);
-        for (Immobilie i : immobilien) {
-            fileWriter.append(i.toStringCSV()).append("\n");
-        }
-        fileWriter.flush();
-        fileWriter.close();
-    }
-
-    /**
-     * Aufgabe 7
-     * Lädt eine serialisierte Datei ein und überschreibt die momentane Immobilien collection.
-     * @param filename Datei
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    @SuppressWarnings("unchecked")
-    public void loadImmobilien(String filename) throws IOException, ClassNotFoundException {
-        FileInputStream fis = new FileInputStream(filename);
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        immobilien = (List<Immobilie>) ois.readObject();
-        ois.close();
-    }
-
-    public void clear() {
-        immobilien.clear();
-        System.out.println("cleared");
-    }
-
-    /**
      * Aufgabe 5
      * Berechnet den Gesamtwert aller Immobilien.
      * @return Gibt Gesamtwert aller Immobilien zurück.
@@ -235,5 +170,107 @@ public class Immobilienmakler implements Serializable
             }
         }
         return value;
+    }
+
+    /**
+     * Aufgabe 6
+     * Speichert alle Immobilien in eine serialisierte Datei ab.
+     * @param filename Pfad und Name, wo die die Datei gespeichert wird.
+     * @throws ImmobilienException
+     */
+    public void saveImmobilien(String filename) throws ImmobilienException {
+        try {
+            FileOutputStream fos = new FileOutputStream(filename);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(immobilien);
+            oos.close();
+        } catch (IOException e) {
+            throw new ImmobilienException("error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Aufgabe 7
+     * Lädt eine serialisierte Datei ein und überschreibt die momentane Immobilien collection.
+     * @param filename Datei
+     * @throws ImmobilienException
+     */
+    @SuppressWarnings("unchecked")
+    public void loadImmobilien(String filename) throws ImmobilienException {
+        if (Files.exists(Paths.get(filename))) {    //Überprüft, ob File existiert.
+            try {
+                FileInputStream fis = new FileInputStream(filename);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                immobilien = (List<Immobilie>) ois.readObject();
+                ois.close();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new ImmobilienException("error: " + e.getMessage());
+            }
+        } else {
+            throw new ImmobilienException("Ausgewähltes File existiert nicht.");
+        }
+    }
+
+    /**
+     * Aufgabe 8
+     * Schreibt alle Immobilien in eine txt Datei im CSV Format.
+     * @param filename Pfad und Dateiname, wo die Datei gespeichert werden soll.
+     * @throws ImmobilienException
+     */
+    public void exportImmobilienCsv(String filename) throws ImmobilienException {
+        try {
+            FileWriter fileWriter = new FileWriter(filename);
+            for (Immobilie i : immobilien) {
+                fileWriter.append(i.toStringCSV()).append("\n");
+            }
+            fileWriter.flush();
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new ImmobilienException("error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Methode zum testen von import/export Methoden.
+     */
+    public void clear() {
+        immobilien.clear();
+    }
+
+    /**
+     * Aufgabe 11(Bonus-Aufgabe)
+     * Speichert den Makler samt allen dazugehörigen Daten mittels Serialisierung in eine Datei.
+     * @param filename Pfad und Dateiname, wo diese Datei gespeichert werden soll.
+     * @throws ImmobilienException
+     */
+    public void saveMakler(String filename) throws ImmobilienException {
+        try {
+            FileOutputStream fos = new FileOutputStream(filename);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(this);
+            oos.close();
+        } catch (IOException e) {
+            throw new ImmobilienException("error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Aufgabe 12
+     * @param filename Pfad wo die einzulesende Datei ist.
+     * @return Gibt einen neuen ImmobilienMakler zurück, wenn die Datei existiert. Ansonsten null
+     * @throws ImmobilienException
+     */
+    public static Immobilienmakler loadMakler(String filename) throws ImmobilienException {
+        if (Files.exists(Paths.get(filename))) {    //Überprüft, ob Datei existiert.
+            try {
+                FileInputStream fis = new FileInputStream(filename);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                return (Immobilienmakler) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new ImmobilienException("error: " + e.getMessage());
+            }
+        } else {
+            throw new ImmobilienException("erro: File existiert nicht.");
+        }
     }
 }

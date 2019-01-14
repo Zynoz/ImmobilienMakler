@@ -7,11 +7,6 @@ public abstract class Immobilie implements Comparable<Immobilie>, Serializable
     private String adresse;
     private double flaeche;
 
-    /**
-     * Aufgabe 1
-     * @param adresse Adresse der Immobilie
-     * @throws ImmobilienException
-     */
     public Immobilie(String adresse) throws ImmobilienException
     {
         setAdresse(adresse);
@@ -46,7 +41,7 @@ public abstract class Immobilie implements Comparable<Immobilie>, Serializable
     }
 
     /**
-     * Teil von Aufgabe 11
+     * Teil von Aufgabe 8
      * @return Gibt die Immobilie im CSV Format zurück.
      */
     public String toStringCSV() {
