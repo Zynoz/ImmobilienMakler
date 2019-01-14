@@ -6,7 +6,12 @@ public abstract class Immobilie implements Comparable<Immobilie>, Serializable
 {
     private String adresse;
     private double flaeche;
-   
+
+    /**
+     * Aufgabe 1
+     * @param adresse Adresse der Immobilie
+     * @throws ImmobilienException
+     */
     public Immobilie(String adresse) throws ImmobilienException
     {
         setAdresse(adresse);
@@ -40,6 +45,10 @@ public abstract class Immobilie implements Comparable<Immobilie>, Serializable
         return adresse + " | " + flaeche + " m2";
     }
 
+    /**
+     * Teil von Aufgabe 11
+     * @return Gibt die Immobilie im CSV Format zurück.
+     */
     public String toStringCSV() {
         String test = this.getClass() +
                 ";" +
@@ -48,7 +57,7 @@ public abstract class Immobilie implements Comparable<Immobilie>, Serializable
                 this.getFlaeche() +
                 ";" +
                 this.berechneVerkehrswert();
-        return test.substring(6);
+        return test.substring(6);   //Substring(6), da mit this.getClass() sonst "class.mode.Immobilie" zurückgegeben wird.
     }
 
     @Override
