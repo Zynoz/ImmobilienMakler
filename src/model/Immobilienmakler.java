@@ -136,7 +136,8 @@ public class Immobilienmakler implements Serializable
         if (value.equals("aufsteigend")) {
             sortiereAdresse();
         } else if (value.equals("absteigend")) {
-            immobilien.sort(new AbsteigendAdressComparator());
+            immobilien.sort(new AdressComparator());
+            Collections.reverse(immobilien);
         } else {
             throw new ImmobilienException("Falscher Parameter: " + value);
         }
