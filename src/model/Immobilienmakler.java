@@ -56,7 +56,7 @@ public class Immobilienmakler implements Serializable
     /**
      * Aufgabe 5
      * Entgernt Immobilie an übergebener Position.
-     * @param pos
+     * @param pos Position die entfernt werden soll.
      * @throws ImmobilienException
      */
     public void remove(int pos) throws ImmobilienException {
@@ -179,11 +179,8 @@ public class Immobilienmakler implements Serializable
      * @throws ImmobilienException
      */
     public void saveImmobilien(String filename) throws ImmobilienException {
-        try {
-            FileOutputStream fos = new FileOutputStream(filename);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+        try (FileOutputStream fos = new FileOutputStream(filename); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(immobilien);
-            oos.close();
         } catch (IOException e) {
             throw new ImmobilienException("error: " + e.getMessage());
         }
@@ -198,11 +195,8 @@ public class Immobilienmakler implements Serializable
     @SuppressWarnings("unchecked")
     public void loadImmobilien(String filename) throws ImmobilienException {
         if (Files.exists(Paths.get(filename))) {    //Überprüft, ob File existiert.
-            try {
-                FileInputStream fis = new FileInputStream(filename);
-                ObjectInputStream ois = new ObjectInputStream(fis);
+            try (FileInputStream fis = new FileInputStream(filename); ObjectInputStream ois = new ObjectInputStream(fis)) {
                 immobilien = (List<Immobilie>) ois.readObject();
-                ois.close();
             } catch (IOException | ClassNotFoundException e) {
                 throw new ImmobilienException("error: " + e.getMessage());
             }
@@ -218,13 +212,11 @@ public class Immobilienmakler implements Serializable
      * @throws ImmobilienException
      */
     public void exportImmobilienCsv(String filename) throws ImmobilienException {
-        try {
-            FileWriter fileWriter = new FileWriter(filename);
+        try (FileWriter fileWriter = new FileWriter(filename)) {
             for (Immobilie i : immobilien) {
                 fileWriter.append(i.toStringCSV()).append("\n");
             }
             fileWriter.flush();
-            fileWriter.close();
         } catch (IOException e) {
             throw new ImmobilienException("error: " + e.getMessage());
         }
@@ -237,8 +229,7 @@ public class Immobilienmakler implements Serializable
      * @throws ImmobilienException
      */
     public void exportWohnhaeuser(String filename) throws ImmobilienException {
-        try {
-            FileWriter fw = new FileWriter(filename);
+        try (FileWriter fw = new FileWriter(filename)) {
             for (Immobilie i: immobilien) {
                 if (i instanceof Wohnhaus) {
                     Wohnhaus w = (Wohnhaus) i;
@@ -246,7 +237,6 @@ public class Immobilienmakler implements Serializable
                 }
             }
             fw.flush();
-            fw.close();
         } catch (IOException e) {
             throw new ImmobilienException("error: " + e.getMessage());
         }
@@ -283,11 +273,8 @@ public class Immobilienmakler implements Serializable
      * @throws ImmobilienException
      */
     public void saveMakler(String filename) throws ImmobilienException {
-        try {
-            FileOutputStream fos = new FileOutputStream(filename);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+        try (FileOutputStream fos = new FileOutputStream(filename); ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(this);
-            oos.close();
         } catch (IOException e) {
             throw new ImmobilienException("error: " + e.getMessage());
         }
@@ -301,15 +288,13 @@ public class Immobilienmakler implements Serializable
      */
     public static Immobilienmakler loadMakler(String filename) throws ImmobilienException {
         if (Files.exists(Paths.get(filename))) {    //Überprüft, ob Datei existiert.
-            try {
-                FileInputStream fis = new FileInputStream(filename);
-                ObjectInputStream ois = new ObjectInputStream(fis);
+            try (FileInputStream fis = new FileInputStream(filename); ObjectInputStream ois = new ObjectInputStream(fis)) {
                 return (Immobilienmakler) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new ImmobilienException("error: " + e.getMessage());
             }
         } else {
-            throw new ImmobilienException("erro: File existiert nicht.");
+            throw new ImmobilienException("error: File existiert nicht.");
         }
     }
 
