@@ -2,41 +2,41 @@ package model;
 
 import java.io.Serializable;
 
-public abstract class Immobilie implements Comparable<Immobilie>, Serializable
-{
+public abstract class Immobilie implements Comparable<Immobilie>, Serializable {
     private String adresse;
     private double flaeche;
 
-    public Immobilie(String adresse) throws ImmobilienException
-    {
+    public Immobilie(String adresse) throws ImmobilienException {
         setAdresse(adresse);
    }
+
     // ------------------------------------------- getter ---------------------------------
-    public String getAdresse()
-    {
+    public String getAdresse() {
         return adresse;
     }
-    public double getFlaeche()
-    {
+
+    public double getFlaeche() {
         return flaeche;
     }
+
     // ------------------------------------------- setter ---------------------------------
-    public void setAdresse(String adresse) throws ImmobilienException
-    {
-        if (adresse != null)
+    public void setAdresse(String adresse) throws ImmobilienException {
+        if (adresse != null) {
             this.adresse = adresse;
-        else
+        } else {
             throw new ImmobilienException("null-Referenz für Immobilie.setAdresse()!!");
+        }
     }
-    public void setFlaeche(double flaeche) throws ImmobilienException
-    { 		//  Plausibilitätsprüfung erfolgt bei den Sub-Klassen
-            this.flaeche = flaeche;
+
+    public void setFlaeche(double flaeche) throws ImmobilienException {
+        //  Plausibilitätsprüfung erfolgt bei den Sub-Klassen
+        this.flaeche = flaeche;
     }
+
 // ------------------------------------------- other ---------------------------------
     public abstract double berechneVerkehrswert();
     
-    public String toString()
-    {
+    public String toString() {
         return adresse + " | " + flaeche + " m2";
     }
 

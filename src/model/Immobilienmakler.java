@@ -8,44 +8,41 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class Immobilienmakler implements Serializable
-{
+public class Immobilienmakler implements Serializable {
     private String name;
     private List<Immobilie> immobilien;
     
-    public Immobilienmakler(String name) throws ImmobilienException
-    {
+    public Immobilienmakler(String name) throws ImmobilienException {
         setName(name);
         immobilien = new ArrayList<>();
     }
 
     //------------------------------------- getter -------------------
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
     //------------------------------------- setter -------------------
-    public void setName(String name) throws ImmobilienException
-    {
-        if (name != null)
+    public void setName(String name) throws ImmobilienException {
+        if (name != null) {
             this.name = name;
-        else
+        } else {
             throw new ImmobilienException("null-Referenz für ImmobilienMakler.setName()!!");
+        }
     }
     //------------------------------------- other -------------------
-    public void add(Immobilie immo) throws ImmobilienException
-    {
-        if (immo != null)
-                if (!immobilien.contains(immo))
-                    immobilien.add(immo);
-                else
-                    throw new ImmobilienException("Immobilie ("+immo+") ist schon in der Collection!!");
-        else
+    public void add(Immobilie immo) throws ImmobilienException {
+        if (immo != null) {
+            if (!immobilien.contains(immo)) {
+                immobilien.add(immo);
+            } else {
+                throw new ImmobilienException("Immobilie (" + immo + ") ist schon in der Collection!!");
+            }
+        } else {
             throw new ImmobilienException("null-Referenz für ImmobilienMakler.hinzufuegen()!!");
+        }
     }
     //------------------------------- toStrings ---------------------------------------
-    public String toString()
-    {
+    public String toString() {
     	StringBuilder sb = new StringBuilder("Immobilienmakler \"").append(name).append("\", derzeit ").append(immobilien.size()).append( " Immobilien in Verwaltung").
                                                                     append("\n----------------------------------------------------------------------\n");
         for (Immobilie immo : immobilien)
@@ -73,17 +70,21 @@ public class Immobilienmakler implements Serializable
      * @param adresse Adresse, von der Immobilien entfernt werden sollen.
      * @return Anzahl an entfernten Immobilien.
      */
-    public int remove(String adresse) {
-        Iterator iterator = immobilien.iterator();
-        int count = 0;
-        while (iterator.hasNext()) {
-            Immobilie i = (Immobilie) iterator.next();
-            if (i.getAdresse().equals(adresse)) {
-                iterator.remove();
-                count++;
+    public int remove(String adresse) throws ImmobilienException {
+        if (adresse.isEmpty()) {
+            Iterator iterator = immobilien.iterator();
+            int count = 0;
+            while (iterator.hasNext()) {
+                Immobilie i = (Immobilie) iterator.next();
+                if (i.getAdresse().equals(adresse)) {
+                    iterator.remove();
+                    count++;
+                }
             }
+            return count;
+        } else {
+            throw new ImmobilienException("Ungültige Adresse");
         }
-        return count;
     }
 
     /**
@@ -133,9 +134,9 @@ public class Immobilienmakler implements Serializable
      * @throws ImmobilienException
      */
     public void sortiereAdresse(String value) throws ImmobilienException {
-        if (value.equals("aufsteigend")) {
+        if (value.equalsIgnoreCase("aufsteigend")) {
             sortiereAdresse();
-        } else if (value.equals("absteigend")) {
+        } else if (value.equalsIgnoreCase("absteigend")) {
             immobilien.sort(new AdressComparator());
             Collections.reverse(immobilien);
         } else {
@@ -154,6 +155,15 @@ public class Immobilienmakler implements Serializable
             value += i.berechneVerkehrswert();
         }
         return value;
+    }
+
+    /**
+     * Aufgabe 5
+     * Berechnet den Gesamtwert aller Immobilien.
+     * @return Gibt Gesamtwert aller Immobilien zurück.
+     */
+    public double berechneGesamtwertWithStream() {
+        return immobilien.stream().mapToDouble(Immobilie::berechneVerkehrswert).sum();
     }
 
     /**
@@ -264,6 +274,30 @@ public class Immobilienmakler implements Serializable
             }
         } else {
             throw new ImmobilienException("");
+        }
+    }
+
+    /**
+     * Aufgabe
+     * Importiert alle Immobilien aus einem CSV file.
+     * @param filename CSV file to import.
+     * @throws ImmobilienException
+     */
+    public void importImmobilien(String filename) throws ImmobilienException{
+        if (Files.exists(Paths.get(filename))) {
+            String line;
+            try(BufferedReader br = new BufferedReader(new FileReader(filename))) {
+                while ((line = br.readLine()) != null) {
+                    String[] csv = line.split(";");
+                    if (csv[0].contains("Grundstueck")) {
+                        immobilien.add(new Grundstueck(csv[1], Double.valueOf(csv[2]), csv[3].charAt(0), Double.valueOf(csv[4])));
+                    } else {
+                        immobilien.add(new Wohnhaus(csv[1], Double.valueOf(csv[2]), csv[3].charAt(0), Double.valueOf(csv[4])));
+                    }
+                }
+            } catch (IOException e) {
+                throw new ImmobilienException("error: " + e.getMessage());
+            }
         }
     }
 
